@@ -1,8 +1,23 @@
 import express from 'express'
+import { bugService } from './services/bug.service.js'
 const app = express()
 
 app.use(express.static('public'))
 
+app.get('/api/bug', (req, res) => {
+    bugService.query()
+        .then(bugs => res.send(bugs))
+})
+
+app.get('/api/bug/:_id/remove', (req, res) => {
+    const bugId = req.params._id
+    bugService.remove(bugId)
+        .then(() => res.send('OK'))
+        .catch(err => {
+            loggerService.error(err)
+            res.status(404).send('Cant remove bug')
+        })
+})
 // app.get('/about', (req, res) => {
 //     res.send('Hello here')
 // })
