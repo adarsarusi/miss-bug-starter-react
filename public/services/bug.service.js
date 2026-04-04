@@ -43,41 +43,40 @@ function remove(bugId) {
 }
 
 function save(bug) {
-    if (bug._id) {
-        return storageService.put(STORAGE_KEY, bug)
-    } else {
-        return storageService.post(STORAGE_KEY, bug)
-    }
+    const queryStr = `save?title=${bug.title}&severity=${bug.severity}&description=${bug.description}&_id=${bug._id || ''}`
+
+    return axios.get(BASE_URL + queryStr)
+        .then(res => res.data)
 }
 
-function _createBugs() {
-    let bugs = utilService.loadFromStorage(STORAGE_KEY)
-    if (bugs && bugs.length > 0) return 
+// function _createBugs() {
+//     let bugs = utilService.loadFromStorage(STORAGE_KEY)
+//     if (bugs && bugs.length > 0) return 
 
-    bugs = [
-        {
-            title: "Infinite Loop Detected",
-            severity: 4,
-            _id: "1NF1N1T3"
-        },
-        {
-            title: "Keyboard Not Found",
-            severity: 3,
-            _id: "K3YB0RD"
-        },
-        {
-            title: "404 Coffee Not Found",
-            severity: 2,
-            _id: "C0FF33"
-        },
-        {
-            title: "Unexpected Response",
-            severity: 1,
-            _id: "G0053"
-        }
-    ]
-    utilService.saveToStorage(STORAGE_KEY, bugs)
-}
+//     bugs = [
+//         {
+//             title: "Infinite Loop Detected",
+//             severity: 4,
+//             _id: "1NF1N1T3"
+//         },
+//         {
+//             title: "Keyboard Not Found",
+//             severity: 3,
+//             _id: "K3YB0RD"
+//         },
+//         {
+//             title: "404 Coffee Not Found",
+//             severity: 2,
+//             _id: "C0FF33"
+//         },
+//         {
+//             title: "Unexpected Response",
+//             severity: 1,
+//             _id: "G0053"
+//         }
+//     ]
+//     utilService.saveToStorage(STORAGE_KEY, bugs)
+// }
 
 function getDefaultFilter() {
     return { txt: '', minSeverity: 0 }

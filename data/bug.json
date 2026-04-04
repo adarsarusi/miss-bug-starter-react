@@ -1,17 +1,25 @@
 [
   {
     "title": "Infinite Loop Detected",
-    "severity": 4,
+    "severity": 5,
     "_id": "1NF1N1T3"
   },
   {
     "title": "Keyboard Not Found",
     "severity": 3,
+    "description": "Please connect a mouse",
     "_id": "K3YB0RD"
   },
   {
     "title": "404 Coffee Not Found",
     "severity": 2,
+    "description": "Ocha kudasai",
     "_id": "C0FF33"
+  },
+  {
+    "title": "Unexpected Response",
+    "severity": 1,
+    "description": "DUCK",
+    "_id": "G0053"
   }
 ]
