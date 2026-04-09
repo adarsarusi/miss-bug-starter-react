@@ -1,8 +1,11 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
+
 import { bugService } from './services/bug.service.js'
 const app = express()
 
 app.use(express.static('public'))
+app.use(cookieParser())
 
 app.get('/api/bug', (req, res) => {
     bugService.query()
@@ -25,8 +28,26 @@ app.get('/api/bug/save', (req, res) => {
 app.get('/api/bug/:_id', (req, res) => {
     const bugId = req.params._id
 
+    let EXPIRATION = 7000
+
+    let visitedBugs = req.cookies['visited-bugs'] || []
+
+    if (visitedBugs.length === 3) return res.status(401).send('Wait for a bit')
+
+    let visitedBug = { id: bugId, visitedAt: Date.now()}
+
+    visitedBugs = visitedBugs.filter(bug => Date.now() - bug.visitedAt < EXPIRATION)
+
+    visitedBugs.push(visitedBug)
+
     bugService.get(bugId)
-        .then(bug => res.send(bug))
+        .then(bug => {
+            res.cookie('visited-bugs', visitedBugs, { maxAge: EXPIRATION })
+
+            console.log('user visited the following bugs: ' + visitedBugs.map(bug => bug.id))
+
+            res.send(bug)
+        })
         .catch(err => {
             loggerService.error(err)
             res.status(404).send('Cant find bug')
