@@ -43,3 +43,29 @@ function saveToStorage(keyDB, val) {
     const valStr = JSON.stringify(val)
     localStorage.setItem(keyDB, valStr)
 }
+
+export function debounce(fn, delay) {
+    let timer
+    return (...args) => {
+        // clear any pre-existing timer
+        if (timer) clearTimeout(timer)
+
+        // call the function if time expires
+        timer = setTimeout(() => fn(...args), delay)
+    }
+}
+
+export function formatDate(timestamp, isFullDate) {
+    const date = new Date(timestamp)
+
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+
+    if (isFullDate) return `${hours}:${minutes} ${day}/${month}/${year}`
+    
+    return `${day}/${month}/${year}`
+}

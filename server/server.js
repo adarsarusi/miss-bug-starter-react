@@ -1,28 +1,29 @@
 import express from 'express'
+import path from 'path'
 import cookieParser from 'cookie-parser'
 
 import { bugService } from './services/bug.service.js'
 const app = express()
 
 app.use(express.static('public'))
+app.use(express.json())
 app.use(cookieParser())
 
+// support arrays in query params
+app.set('query parser', 'extended')
+
 app.get('/api/bug', (req, res) => {
-    bugService.query()
-        .then(bugs => res.send(bugs))
-})
-
-app.get('/api/bug/save', (req, res) => {
-    const { _id, title, severity, description } = req.query
-    const bugToSave = {
-        _id,
-        title,
-        severity: +severity,
-        description
+    const filterBy = {
+        txt: req.query.txt || '',
+        minSeverity: +req.query.minSeverity || 0,
+        paginationOn: req.query.paginationOn === 'true',
+        pageIdx: +req.query.pageIdx || 0,
+        sortBy: req.query.sortBy || 'title',
+        sortDir: +req.query.sortDir || 1,
+        createdAt: +req.query.createdAt || 0
     }
-
-    bugService.save(bugToSave)
-        .then(savedBug => res.send(savedBug))
+    bugService.query(filterBy)
+        .then(bugs => res.send(bugs))
 })
 
 app.get('/api/bug/:_id', (req, res) => {
@@ -54,7 +55,7 @@ app.get('/api/bug/:_id', (req, res) => {
         })
 })
 
-app.get('/api/bug/:_id/remove', (req, res) => {
+app.delete('/api/bug/:_id', (req, res) => {
     const bugId = req.params._id
     bugService.remove(bugId)
         .then(() => res.send('OK'))
@@ -63,7 +64,42 @@ app.get('/api/bug/:_id/remove', (req, res) => {
             res.status(404).send('Cant remove bug')
         })
 })
-// app.get('/about', (req, res) => {
-//     res.send('Hello here')
-// })
+
+app.put('/api/bug/:_id', (req, res) => {
+    const { _id, title, severity, description } = req.body
+    const bugToSave = {
+        _id,
+        title,
+        severity: +severity,
+        description
+    }
+
+    bugService.save(bugToSave)
+        .then(savedBug => res.send(savedBug))
+        .catch(err => {
+            loggerService.error(err)
+            res.status(404).send(err)
+        })
+})
+
+app.post('/api/bug', (req, res) => {
+    const { title, severity, description } = req.body
+    const bugToSave = {
+        title,
+        severity: +severity,
+        description
+    }
+
+    bugService.save(bugToSave)
+        .then(savedBug => res.send(savedBug))
+        .catch(err => {
+            loggerService.error(err)
+            res.status(404).send(err)
+        })
+})
+
+app.get('{*splat}', (req, res) => {
+    res.sendFile(path.resolve('public/index.html'))
+})
+
 app.listen(5501, () => console.log('Server ready at port 5501'))

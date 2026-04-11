@@ -1,6 +1,7 @@
 import { makeId, readJsonFile, writeJsonFile } from './util.service.js'
 
 const PATH = 'data/bug.json'
+const PAGE_SIZE = 3
 const bugs = readJsonFile(PATH)
 
 export const bugService = {
@@ -10,14 +11,50 @@ export const bugService = {
     save,
 }
 
-function query() {
-    return Promise.resolve(bugs)
+function query(filterBy = {}) {
+
+    let filteredBugs = bugs
+
+    if (filterBy.txt) {
+        const regExp = new RegExp(filterBy.txt, 'i')
+        filteredBugs = filteredBugs.filter(bug => regExp.test(bug.title))
+    }
+
+    if (filterBy.minSeverity) {
+        filteredBugs = filteredBugs.filter(bug => bug.severity >= filterBy.minSeverity)
+    }
+
+    if (filterBy.sortBy) {
+        const {sortBy, sortDir} = filterBy
+
+        filteredBugs.sort((a, b) => {
+            let valA = a[sortBy]
+            let valB = b[sortBy]
+
+            if (typeof valA === 'string'){
+                return valA.localeCompare(valB) * sortDir
+            }
+            
+            return (valA - valB) * sortDir
+        })
+    }
+
+    const total = filteredBugs.length
+
+    if (filterBy.paginationOn) {
+        const startIdx = filterBy.pageIdx * PAGE_SIZE
+        const endIdx = filterBy.pageIdx * PAGE_SIZE + PAGE_SIZE
+
+        filteredBugs = filteredBugs.slice(startIdx, endIdx)
+    }
+
+    return Promise.resolve({ bugs: filteredBugs, total })
 }
 
 function get(bugId) {
     const bug = bugs.find(bug => bug._id === bugId)
     if (!bug) return Promise.reject(`Cant find bug with id ${bugId}`)
-        
+
     return Promise.resolve(bug)
 }
 

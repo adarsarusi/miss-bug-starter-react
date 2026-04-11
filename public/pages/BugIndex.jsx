@@ -1,5 +1,6 @@
-const { useState, useEffect } = React
+const { useState, useEffect, useRef } = React
 
+import { debounce } from "../services/util.service.js"
 import { bugService } from '../services/bug.service.js'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 
@@ -9,12 +10,18 @@ import { BugList } from '../cmps/BugList.jsx'
 export function BugIndex() {
     const [bugs, setBugs] = useState(null)
     const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
+    const [total, setTotal] = useState(null)
+
+    const debouncedOnSetFilterBy = useRef(debounce(setFilterBy, 500)).current
 
     useEffect(loadBugs, [filterBy])
 
     function loadBugs() {
         bugService.query(filterBy)
-            .then(setBugs)
+            .then(({ bugs, total }) => {
+                setBugs(bugs)
+                setTotal(total)
+            })
             .catch(err => showErrorMsg(`Couldn't load bugs - ${err}`))
     }
 
@@ -32,7 +39,8 @@ export function BugIndex() {
         const bug = {
             title: prompt('Bug title?', 'Bug ' + Date.now()),
             severity: +prompt('Bug severity?', 3),
-            description: prompt('Describe what happens')
+            description: prompt('Describe what happens'),
+            createdAt: Date.now()
         }
 
         bugService.save(bug)
@@ -65,19 +73,21 @@ export function BugIndex() {
     }
 
     return <section className="bug-index main-content">
-        
+
         <header>
             <h2>Bug List</h2>
             <button onClick={onAddBug}>Add Bug</button>
         </header>
-        
-        <BugFilter 
-            filterBy={filterBy} 
-            onSetFilterBy={onSetFilterBy} />
 
-        <BugList 
-            bugs={bugs} 
-            onRemoveBug={onRemoveBug} 
+        <BugFilter
+            filterBy={filterBy}
+            onSetFilterBy={onSetFilterBy}
+            onSetFilterByDebounced={debouncedOnSetFilterBy}
+            total={total} />
+
+        <BugList
+            bugs={bugs}
+            onRemoveBug={onRemoveBug}
             onEditBug={onEditBug} />
     </section>
 }

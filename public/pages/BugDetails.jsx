@@ -1,6 +1,7 @@
 const { useState, useEffect } = React
 const { Link, useParams, useNavigate } = ReactRouterDOM
 
+import { formatDate } from "../services/util.service.js"
 import { bugService } from '../services/bug.service.js'
 import { showErrorMsg } from '../services/event-bus.service.js'
 
@@ -33,6 +34,7 @@ export function BugDetails() {
             <div>
                 <h3>{bug.title}</h3>
                 <p className="severity">Severity: <span>{bug.severity}</span></p>
+                <p className="createdAt">{formatDate(bug.createdAt, true)}</p>
                 <p>Description: <span>{bug.description}</span></p>
             </div>
         }
