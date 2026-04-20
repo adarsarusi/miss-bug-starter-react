@@ -24,6 +24,10 @@ function query(filterBy = {}) {
         filteredBugs = filteredBugs.filter(bug => bug.severity >= filterBy.minSeverity)
     }
 
+    if (filterBy.labels && filterBy.labels.length > 0) {
+        filteredBugs = filteredBugs.filter(bug => filterBy.labels.some(label => bug.labels?.includes(label)))
+    }
+
     if (filterBy.sortBy) {
         const {sortBy, sortDir} = filterBy
 

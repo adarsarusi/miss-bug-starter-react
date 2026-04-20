@@ -20,10 +20,15 @@ app.get('/api/bug', (req, res) => {
         pageIdx: +req.query.pageIdx || 0,
         sortBy: req.query.sortBy || 'title',
         sortDir: +req.query.sortDir || 1,
-        createdAt: +req.query.createdAt || 0
+        createdAt: +req.query.createdAt || 0,
+        labels: req.query.labels || []
     }
     bugService.query(filterBy)
         .then(bugs => res.send(bugs))
+        .catch(err => {
+            loggerService.error('Cannot get bugs', err)
+            res.status(400).send('Cannot get bugs')
+        })
 })
 
 app.get('/api/bug/:_id', (req, res) => {
@@ -35,7 +40,7 @@ app.get('/api/bug/:_id', (req, res) => {
 
     if (visitedBugs.length === 3) return res.status(401).send('Wait for a bit')
 
-    let visitedBug = { id: bugId, visitedAt: Date.now()}
+    let visitedBug = { id: bugId, visitedAt: Date.now() }
 
     visitedBugs = visitedBugs.filter(bug => Date.now() - bug.visitedAt < EXPIRATION)
 
@@ -71,7 +76,8 @@ app.put('/api/bug/:_id', (req, res) => {
         _id,
         title,
         severity: +severity,
-        description
+        description,
+        labels: labels || []
     }
 
     bugService.save(bugToSave)
@@ -87,7 +93,8 @@ app.post('/api/bug', (req, res) => {
     const bugToSave = {
         title,
         severity: +severity,
-        description
+        description,
+        labels: labels || []
     }
 
     bugService.save(bugToSave)

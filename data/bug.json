@@ -4,48 +4,55 @@
     "severity": 5,
     "_id": "1NF1N1T3",
     "description": "loop loop loop",
-    "createdAt": 1775911219607
+    "createdAt": 1775911219607,
+    "labels": "['back', 'fixed']"
   },
   {
     "title": "Keyboard Not Found",
     "severity": 3,
     "description": "Please connect a mouse",
     "_id": "K3YB0RD",
-    "createdAt": 1775936119607
+    "createdAt": 1775936119607,
+    "labels": "['front', 'fixed']"
   },
   {
     "title": "404 Coffee Not Found",
     "severity": 2,
     "description": "Ocha kudasai",
     "_id": "C0FF33",
-    "createdAt": 1775916112607
+    "createdAt": 1775916112607,
+    "labels": "['front', 'in progress']"
   },
   {
     "title": "Unexpected Response",
     "severity": 1,
     "description": "DUCK",
     "_id": "G0053",
-    "createdAt": 1775916111207
+    "createdAt": 1775916111207,
+    "labels": "['stuck']"
   },
   {
     "title": "Bug 1775916119607",
     "severity": 3,
     "description": "mashu",
     "_id": "zt6jZ",
-    "createdAt": 1775916119127
+    "createdAt": 1775916119127,
+    "labels": "[]"
   },
   {
     "title": "Bug 1775916138515",
     "severity": 3,
     "description": "ssss",
     "_id": "xzA78",
-    "createdAt": 1775916129607
+    "createdAt": 1775916129607,
+    "labels": "['stuck', 'fixed']"
   },
   {
     "title": "Bug 1775916145460",
     "severity": 3,
     "description": "aewrq",
     "_id": "X4rOt",
-    "createdAt": 1775916111207
+    "createdAt": 1775916111207,
+    "labels": "[]"
   }
 ]

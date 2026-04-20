@@ -1,5 +1,8 @@
 const { useState, useEffect } = React
 
+import { bugService } from '../services/bug.service.js'
+import { LabelChooser } from "./LabelChooser.jsx"
+
 export function BugFilter({ filterBy, onSetFilterBy, onSetFilterByDebounced, total }) {
 
     const [filterByToEdit, setFilterByToEdit] = useState(filterBy)
@@ -7,9 +10,11 @@ export function BugFilter({ filterBy, onSetFilterBy, onSetFilterByDebounced, tot
     const PAGE_SIZE = 3
     const maxPage = Math.ceil(total / PAGE_SIZE) - 1
 
+    const labels = bugService.getLabels()
+
     useEffect(() => {
         onSetFilterByDebounced(filterByToEdit)
-    }, [filterByToEdit.txt, filterByToEdit.minSeverity])
+    }, [filterByToEdit.txt, filterByToEdit.minSeverity, filterByToEdit.labels])
 
     function handleChange({ target }) {
         const field = target.name
@@ -29,7 +34,7 @@ export function BugFilter({ filterBy, onSetFilterBy, onSetFilterByDebounced, tot
         if (field === 'sortDir' || field === 'createdAt') value = +value
 
         setFilterByToEdit(prevFilter => {
-            const updated = { ...prevFilter, [field]: value, pageIdx: 0}
+            const updated = { ...prevFilter, [field]: value, pageIdx: 0 }
 
             if (field === 'sortBy' || field === 'sortDir' || field === 'createdAt') {
                 onSetFilterBy(updated)
@@ -74,29 +79,44 @@ export function BugFilter({ filterBy, onSetFilterBy, onSetFilterByDebounced, tot
         <form className="bug-filter" onSubmit={onSubmitFilter}>
             <p>Filter</p>
 
-            <button disabled={!filterBy.paginationOn} onClick={() => onGetPage(-1)}>-</button>
-            <span>{filterBy.pageIdx}</span>
-            <button disabled={!filterBy.paginationOn} onClick={() => onGetPage(1)}>+</button>
-            <button onClick={togglePagination}>Toggle Pagination</button>
+            <div className="filter">
 
-            <label htmlFor="txt">Text: </label>
-            <input value={txt} onChange={handleChange} type="text" placeholder="Search title / desc." id="txt" name="txt" />
+                <button disabled={!filterBy.paginationOn} onClick={() => onGetPage(-1)}>-</button>
+                <span>{filterBy.pageIdx}</span>
+                <button disabled={!filterBy.paginationOn} onClick={() => onGetPage(1)}>+</button>
+                <button onClick={togglePagination}>Toggle Pagination</button>
 
-            <label htmlFor="minSeverity">Min Severity: </label>
-            <input value={minSeverity || ''} onChange={handleChange} type="number" placeholder="By Min Severity" id="minSeverity" name="minSeverity" />
+                <label htmlFor="txt">Text: </label>
+                <input value={txt} onChange={handleChange} type="text" placeholder="Search title / desc." id="txt" name="txt" />
 
-            <label htmlFor="sortBy">Sort By:</label>
-            <select name="sortBy" value={filterByToEdit.sortBy} onChange={handleChange}>
-                <option value="title">Title</option>
-                <option value="severity">Severity</option>
-                <option value="createdAt">Created At</option>
-            </select>
+                <label htmlFor="minSeverity">Min Severity: </label>
+                <input value={minSeverity || ''} onChange={handleChange} type="number" placeholder="By Min Severity" id="minSeverity" name="minSeverity" />
 
-            <label htmlFor="sortDir">Sort Dir:</label>
-            <select name="sortDir" value={filterByToEdit.sortDir} onChange={handleChange}>
-                <option value="1">Asc</option>
-                <option value="-1">Desc</option>
-            </select>
+            </div>
+            <div className="sort">
+
+                <label htmlFor="sortBy">Sort By:</label>
+                <select name="sortBy" value={filterByToEdit.sortBy} onChange={handleChange}>
+                    <option value="title">Title</option>
+                    <option value="severity">Severity</option>
+                    <option value="createdAt">Created At</option>
+                </select>
+
+                <label htmlFor="sortDir">Sort Dir:</label>
+                <select name="sortDir" value={filterByToEdit.sortDir} onChange={handleChange}>
+                    <option value="1">Asc</option>
+                    <option value="-1">Desc</option>
+                </select>
+
+            </div>
+            <div className="label">
+
+                <LabelChooser
+                    labels={labels}
+                    filterBy={filterByToEdit}
+                    onSetFilterBy={setFilterByToEdit} />
+
+            </div>
 
         </form>
     )
