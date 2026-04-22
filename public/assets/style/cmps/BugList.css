@@ -22,8 +22,9 @@
 .bug-list .actions {
     display: flex;
     gap: .3em;
+
 }
 
 .bug-list .actions button:last-child {
-    margin-inline-start: auto;
+    /* margin-inline-start: auto; */
 }

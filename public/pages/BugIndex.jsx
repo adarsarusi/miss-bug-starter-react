@@ -6,11 +6,14 @@ import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 
 import { BugFilter } from '../cmps/BugFilter.jsx'
 import { BugList } from '../cmps/BugList.jsx'
+import { authService } from "../services/auth.service.js"
 
 export function BugIndex() {
     const [bugs, setBugs] = useState(null)
     const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
     const [total, setTotal] = useState(null)
+
+    const loggedinUser = authService.getLoggedinUser()
 
     const debouncedOnSetFilterBy = useRef(debounce(setFilterBy, 500)).current
 
@@ -76,7 +79,7 @@ export function BugIndex() {
 
         <header>
             <h2>Bug List</h2>
-            <button onClick={onAddBug}>Add Bug</button>
+            {loggedinUser && <button onClick={onAddBug}>Add Bug</button>}
         </header>
 
         <BugFilter

@@ -1,8 +1,8 @@
-import { makeId, readJsonFile, writeJsonFile } from './util.service.js'
+import { utilService } from './util.service.js'
 
 const PATH = 'data/bug.json'
 const PAGE_SIZE = 3
-const bugs = readJsonFile(PATH)
+const bugs = utilService.readJsonFile(PATH)
 
 export const bugService = {
     query,
@@ -76,7 +76,7 @@ function save(bugToSave) {
         const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
         bugs[idx] = { ...bugs[idx], ...bugToSave }
     } else {
-        bugToSave._id = makeId()
+        bugToSave._id = utilService.makeId()
         bugs.push(bugToSave)
     }
     return _saveBugsToFile()
@@ -84,5 +84,5 @@ function save(bugToSave) {
 }
 
 function _saveBugsToFile() {
-    return writeJsonFile(PATH, bugs)
+    return utilService.writeJsonFile(PATH, bugs)
 }

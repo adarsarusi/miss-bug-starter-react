@@ -3,13 +3,21 @@ import fr from 'follow-redirects'
 
 const { http, https } = fr
 
-export function readJsonFile(path) {
+export const utilService = {
+	readJsonFile,
+    writeJsonFile,
+	download,
+	httpGet,
+	makeId,
+}
+
+function readJsonFile(path) {
     const str = fs.readFileSync(path, 'utf8')
     const json = JSON.parse(str)
     return json
 }
 
-export function writeJsonFile(path, data) {
+function writeJsonFile(path, data) {
     return new Promise((resolve, reject) => {
         const jsonData = JSON.stringify(data, null, 2)
 
@@ -20,7 +28,7 @@ export function writeJsonFile(path, data) {
     })
 }
 
-export function download(url, fileName) {
+function download(url, fileName) {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(fileName)
         https.get(url, (content) => {
@@ -34,7 +42,7 @@ export function download(url, fileName) {
     })
 }
 
-export function httpGet(url) {
+function httpGet(url) {
     const protocol = url.startsWith('https') ? https : http
     const options = {
         method: 'GET'
@@ -58,7 +66,7 @@ export function httpGet(url) {
 
 }
 
-export function makeId(length = 5) {
+function makeId(length = 5) {
     let text = ''
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     

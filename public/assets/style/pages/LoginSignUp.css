@@ -1,0 +1,15 @@
+.login-page{
+    text-align: center;
+}
+
+.login-form{
+    margin-block-start: 2vh;
+    margin-block-end: 1vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+
+
+}

@@ -3,6 +3,8 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 
 import { bugService } from './services/bug.service.js'
+import { userService } from './services/user.service.js'
+import { authService } from './services/auth.service.js'
 const app = express()
 
 app.use(express.static('public'))
@@ -61,7 +63,12 @@ app.get('/api/bug/:_id', (req, res) => {
 })
 
 app.delete('/api/bug/:_id', (req, res) => {
+
+    const loggedInUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedInUser) return res.status(401).send('Unauthenticated...')
+
     const bugId = req.params._id
+
     bugService.remove(bugId)
         .then(() => res.send('OK'))
         .catch(err => {
@@ -71,7 +78,12 @@ app.delete('/api/bug/:_id', (req, res) => {
 })
 
 app.put('/api/bug/:_id', (req, res) => {
-    const { _id, title, severity, description } = req.body
+
+    const loggedInUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedInUser) return res.status(401).send('Unauthenticated...')
+
+    const { _id, title, severity, description, labels } = req.body
+
     const bugToSave = {
         _id,
         title,
@@ -89,12 +101,21 @@ app.put('/api/bug/:_id', (req, res) => {
 })
 
 app.post('/api/bug', (req, res) => {
-    const { title, severity, description } = req.body
+
+    const loggedInUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedInUser) return res.status(401).send('Unauthenticated...')
+
+    const { title, severity, description, labels } = req.body
     const bugToSave = {
         title,
         severity: +severity,
         description,
-        labels: labels || []
+        labels: labels || [],
+        createdAt: Date.now(),                 
+        creator: {
+            _id: loggedInUser._id,
+            fullname: loggedInUser.fullname
+        }
     }
 
     bugService.save(bugToSave)
@@ -103,6 +124,59 @@ app.post('/api/bug', (req, res) => {
             loggerService.error(err)
             res.status(404).send(err)
         })
+})
+
+app.get('/api/user', (req, res) => {
+    userService.query()
+        .then(users => res.send(users))
+        .catch(err => {
+            loggerService.error('Cannot load users', err)
+            res.status(400).send('Cannot load users')
+        })
+})
+
+app.get('/api/user/:userId', (req, res) => {
+    const { userId } = req.params
+
+    userService.getById(userId)
+        .then(user => res.send(user))
+        .catch(err => {
+            loggerService.error('Cannot load user', err)
+            res.status(400).send('Cannot load user')
+        })
+})
+
+app.post('/api/auth/login', (req, res) => {
+    const credentials = req.body
+
+    authService.checkLogin(credentials)
+        .then(user => {
+            const loginToken = authService.getLoginToken(user)
+            res.cookie('loginToken', loginToken)
+            res.send(user)
+        })
+        .catch(() => res.status(404).send('Invalid Credentials'))
+})
+
+app.post('/api/auth/signup', (req, res) => {
+    const credentials = req.body
+
+    userService.add(credentials)
+        .then(user => {
+            if (user) {
+                const loginToken = authService.getLoginToken(user)
+                res.cookie('loginToken', loginToken)
+                res.send(user)
+            } else {
+                res.status(400).send('Cannot signup')
+            }
+        })
+        .catch(err => res.status(400).send('Username taken.'))
+})
+
+app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('loginToken')
+    res.send('logged-out!')
 })
 
 app.get('{*splat}', (req, res) => {

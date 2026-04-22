@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "XtFoM",
+    "username": "adar1",
+    "fullname": "adar sarus1",
+    "password": "adar1",
+    "isAdmin": false
+  },
+  {
+    "_id": "6iykr",
+    "username": "adar2",
+    "fullname": "adar sarusi2",
+    "password": "adar2",
+    "isAdmin": false
+  },
+  {
+    "_id": "tUZPy",
+    "username": "adar3",
+    "fullname": "adar sarusi3",
+    "password": "adar3",
+    "isAdmin": false
+  },
+  {
+    "_id": "wfawE",
+    "username": "admin",
+    "fullname": "adar sarusi",
+    "password": "admin",
+    "isAdmin": true
+  },
+  {
+    "username": "badran",
+    "password": "badran",
+    "fullname": "badran levi",
+    "_id": "LnIPn"
+  }
+]
